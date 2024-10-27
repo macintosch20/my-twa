@@ -1,39 +1,46 @@
+import { useState } from 'react';
+import { HashRouter as Router, Route, Routes } from 'react-router-dom';
+import { TonConnectUIProvider } from '@tonconnect/ui-react';
 import './App.css';
-import { TonConnectButton } from '@tonconnect/ui-react';
-import { useTonConnect } from './hooks/useTonConnect';
-import { useCounterContract } from './hooks/useCounterContract';
-import '@twa-dev/sdk';
+import './styles.css';
+
+import ProfileCreation from './components/ProfileCreation';
+import AddDetailsClient from './components/AddDetailsClient';
+import AddDetailsFreelancer from './components/AddDetailsFreelancer';
+import FreelancerDetailsForm from './components/FreelancerDetailsForm';
+import ConfirmFreelancerDetails from './components/ConfirmFreelancerDetails';
+import LandingPage from './components/LandingPage';
+import ConfirmClientDetails from './components/ConfirmClientDetails';
 
 function App() {
-  const { connected } = useTonConnect();
-  const { value, address, sendIncrement } = useCounterContract();
+  const [clientData, setClientData] = useState({
+    shortDescription: '',
+    longDescription: '',
+  });
+  const [freelancerData, setFreelancerData] = useState({
+    username: '',
+    selectedRole: '',
+    specialties: '',
+    shortDescription: '',
+    longDescription: '',
+    links: [],
+  });
 
   return (
-    <div className='App'>
-      <div className='Container'>
-        <TonConnectButton />
-
-        <div className='Card'>
-          <b>Counter Address</b>
-          <div className='Hint'>{address?.slice(0, 30) + '...'}</div>
-        </div>
-
-        <div className='Card'>
-          <b>Counter Value</b>
-          <div>{value ?? 'Loading...'}</div>
-        </div>
-
-        <a
-          className={`Button ${connected ? 'Active' : 'Disabled'}`}
-          onClick={() => {
-            sendIncrement();
-          }}
-        >
-          Increment
-        </a>
-      </div>
-    </div>
+    <TonConnectUIProvider manifestUrl="https://macintosch20.github.io/my-twa/tonconnect-manifest.json">
+      <Router>
+        <Routes>
+          <Route path="/" element={<LandingPage />} />
+          <Route path="/profile-creation" element={<ProfileCreation freelancerData={freelancerData} setFreelancerData={setFreelancerData} />} />
+          <Route path="/add-details-client" element={<AddDetailsClient clientData={clientData} setClientData={setClientData} />} />
+          <Route path="/add-details-freelancer" element={<AddDetailsFreelancer freelancerData={freelancerData} setFreelancerData={setFreelancerData} />} />
+          <Route path="/freelancer-details-form" element={<FreelancerDetailsForm freelancerData={freelancerData} setFreelancerData={setFreelancerData} />} />
+          <Route path="/confirm-freelancer-details" element={<ConfirmFreelancerDetails freelancerData={freelancerData} />} />
+          <Route path="/confirm-client-details" element={<ConfirmClientDetails clientData={clientData} />} />
+        </Routes>
+      </Router>
+    </TonConnectUIProvider>
   );
 }
 
-export default App
+export default App;
